@@ -32,7 +32,16 @@
           :data="resultMails"
           :default-sort = "{prop: 'date', order: 'descending'}"
           ref="table"
-          style="width: 100%">
+          style="width: 100%"
+          @row-click="rowClicked"
+          class="clickable-rows">
+          <el-table-column
+            width="40"
+            type="expand">
+            <template slot-scope="props">
+              {{ props.row.body }}
+            </template>
+          </el-table-column>
           <el-table-column
             prop="from"
             label="From"
@@ -68,18 +77,20 @@
             sortable>
           </el-table-column>
           <el-table-column
-            width="20">
+            width="25">
             <template slot-scope="scope">
               <img
                 src="@/assets/icon_clip.svg"
-                width="10" height="10"
+                width="14" height="14"
                 v-if="scope.row.attachment"
               />
             </template>
           </el-table-column>
           <el-table-column
+            class-name="date-cell"
             prop="date"
             label="Date"
+            width="120"
             sortable
             :formatter="formatter">
           </el-table-column>
@@ -100,15 +111,15 @@ export default {
       value1: '',
       mails: [
         {
-          date: "2021/01/03 00:20",
-          from: "aaa@example.com",
+          date: "2021-01-03 00:20",
+          from: "aaafefefea@example.com",
           to: ["aaa@example.com"],
           subject: "Happy Holiday",
           attachment: "happy.zip",
-          body: "aaaa",
+          body: "Your Pre-Approval Session (English) with italki Teacher Services at 11:00 (Japan, Korea Time) on Monday, July 27, 2020 has been scheduled.Please click the meeting link below to join the video call. If you re asked to enter a password, please try the meeting link below.",
         },
         {
-          date: "2021/01/03 00:10",
+          date: "2021-01-03 00:10",
           from: "aaa@example.com",
           to: ["aaa@example.com", "aaa@example.com"],
           subject: "Happy Holiday",
@@ -116,7 +127,7 @@ export default {
           body: "aaaa"
         },
         {
-          date: "2021/01/03 00:00",
+          date: "2021-01-03 00:00",
           from: "aaa@example.com",
           to: ["aaa@example.com"],
           subject: "Happy Holiday",
@@ -124,7 +135,23 @@ export default {
           body: "aaaa"
         },
         {
-          date: "2021/01/05 00:00",
+          date: "2021-01-05 00:00",
+          from: "aaa@example.com",
+          to: ["aaa@example.com"],
+          subject: "Happy Holiday",
+          attachment: null,
+          body: "aaaa"
+        },
+        {
+          date: "2020-12-29 12:40",
+          from: "aaa@example.com",
+          to: ["aaa@example.com"],
+          subject: "Happy Holiday",
+          attachment: null,
+          body: "aaaa"
+        },
+        {
+          date: "2021-01-09 18:20",
           from: "aaa@example.com",
           to: ["aaa@example.com"],
           subject: "Happy Holiday",
@@ -155,18 +182,28 @@ export default {
   },
   methods: {
     formatter(row) {
-      // TODO: implement time formatter
-      return row.date
+      let date = moment(row.date)
+      let current = moment()
+      if (date.format("YYYYMMDD") == current.format("YYYYMMDD")) {
+        return date.format("HH:mm")
+      } else if (date.year() == current.year()) {
+        return date.format("MMM DD")
+      } else {
+        return date.format("YYYY/MM/DD")
+      }
     },
     test() {
       console.log(this.$refs.table)
+      this.$refs.table.toggleRowExpansion(1)
+    },
+    rowClicked(row) {
+      this.$refs.table.toggleRowExpansion(row)
     }
   }
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style>
+<style lang="scss">
 .container {
   margin: 50px;
 }
@@ -240,4 +277,22 @@ export default {
   margin-left: auto;
   margin-right: auto;
 }
+.clickable-rows {
+  .cell {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap !important;
+  }
+  tbody tr td {
+    cursor: pointer;
+  }
+}
+.el-table__expanded-cell {
+  cursor: default !important;
+  padding: 20px 51px !important;
+}
+.date-cell {
+  font-weight: bold;
+}
+
 </style>
