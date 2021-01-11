@@ -1,21 +1,21 @@
 <template>
-  <div class="container">
+  <div class="container" :class="{mobile: mode=='mobile'}">
     <div class="date-picker-container">
-        <img class="calender-icon" src="@/assets/icon_calender.svg" width="20" height="20">
-        <el-date-picker
-          class="date-picker"
-          v-model="value1"
-          type="daterange"
-          range-separator="-"
-          start-placeholder="Start date"
-          end-placeholder="End date"
-          :clearable="false"
-          align="left"
-          prefix-icon="icon-disabled">
-        </el-date-picker>
-        <span class="search-icon-container">
-          <img class="search-icon" src="@/assets/icon_search.svg" width="20" height="20">
-        </span>
+      <img class="calender-icon" src="@/assets/icon_calender.svg" width="20" height="20">
+      <el-date-picker
+        class="date-picker"
+        v-model="value1"
+        type="daterange"
+        range-separator="-"
+        start-placeholder="Start date"
+        end-placeholder="End date"
+        :clearable="false"
+        align="left"
+        prefix-icon="icon-disabled">
+      </el-date-picker>
+      <span class="search-icon-container">
+        <img class="search-icon" src="@/assets/icon_search.svg" width="20" height="20">
+      </span>
     </div>
     <div class="result-area">
       <span>Results: </span>
@@ -35,69 +35,95 @@
           style="width: 100%"
           @row-click="rowClicked"
           class="clickable-rows">
-          <el-table-column
-            width="40"
-            type="expand">
-            <template slot-scope="props">
-              {{ props.row.body }}
-            </template>
-          </el-table-column>
-          <el-table-column
-            prop="from"
-            label="From"
-            sortable
-            width="180">
-          </el-table-column>
-          <el-table-column
-            prop="to"
-            label="To"
-            sortable
-            width="180">
-            <template slot-scope="scope">
-              {{scope.row.to[0]}}
-              <template v-if="scope.row.to.length > 1">
-                , ...
+          <template>
+            <el-table-column
+              width="40"
+              type="expand">
+              <template slot-scope="props">
+                {{ props.row.body }}
               </template>
-            </template>
-          </el-table-column>
-          <el-table-column
-            width="80">
-            <template slot-scope="scope">
-              <span
-                class="plus-chip"
-                v-if="scope.row.to.length > 1"
-              >
-                +{{scope.row.to.length-1}}
-              </span>
-            </template>
-          </el-table-column>
-          <el-table-column
-            prop="subject"
-            label="Subject"
-            sortable>
-          </el-table-column>
-          <el-table-column
-            width="25">
-            <template slot-scope="scope">
-              <img
-                src="@/assets/icon_clip.svg"
-                width="14" height="14"
-                v-if="scope.row.attachment"
-              />
-            </template>
-          </el-table-column>
-          <el-table-column
-            class-name="date-cell"
-            prop="date"
-            label="Date"
-            width="120"
-            sortable
-            :formatter="formatter">
-          </el-table-column>
+            </el-table-column>
+            <el-table-column
+              prop="from"
+              label="From"
+              sortable
+              width="180"
+              class-name="from-column">
+            </el-table-column>
+            <el-table-column
+              prop="to"
+              label="To"
+              sortable
+              width="180"
+              class-name="to-column">
+              <template slot-scope="scope">
+                {{scope.row.to[0]}}
+                <template v-if="scope.row.to.length > 1">
+                  , ...
+                </template>
+              </template>
+            </el-table-column>
+            <el-table-column
+              width="80"
+              class-name="plus-column">
+              <template slot-scope="scope">
+                <span
+                  class="plus-chip"
+                  v-if="scope.row.to.length > 1"
+                >
+                  +{{scope.row.to.length-1}}
+                </span>
+              </template>
+            </el-table-column>
+            <el-table-column
+              prop="subject"
+              label="Subject"
+              sortable
+              class-name="subject-column">
+            </el-table-column>
+            <el-table-column
+              width="25"
+              class-name="attachment-column">
+              <template slot-scope="scope">
+                <img
+                  src="@/assets/icon_clip.svg"
+                  width="14" height="14"
+                  v-if="scope.row.attachment"
+                />
+              </template>
+            </el-table-column>
+            <el-table-column
+              class-name="date-column"
+              prop="date"
+              label="Date"
+              width="120"
+              sortable
+              :formatter="formatter">
+            </el-table-column>
+
+            <el-table-column
+              class-name="mobile-cell"
+              width="120">
+              <template slot-scope="scope">
+                <div v-show="mode=='mobile'">
+                <img
+                  src="@/assets/icon_mail_sp.svg"
+                  width="14" height="14"
+                  v-if="scope.row.attachment"
+                />
+                {{scope.row.from}}
+                {{scope.row.to}}
+                {{scope.row.subject}}
+                {{scope.row.date}}
+                </div>
+              </template>
+            </el-table-column>
+
+          </template>
         </el-table>
       </div>
     </div>
-    <button @click="test">debug</button>
+    <button @click="test">debug</button>{{mode}}
   </div>
 </template>
 
@@ -178,6 +204,13 @@ export default {
     },
     mailCount: function() {
       return this.mails.length
+    },
+    mode: function() {
+      if (this.$vssWidth >= 800) {
+        return "normal"
+      } else {
+        return "mobile"
+      }
     }
   },
   methods: {
@@ -193,8 +226,7 @@ export default {
       }
     },
     test() {
-      console.log(this.$refs.table)
-      this.$refs.table.toggleRowExpansion(1)
+      console.log(this.$vssWidth)
     },
     rowClicked(row) {
       this.$refs.table.toggleRowExpansion(row)
@@ -293,6 +325,12 @@ export default {
 }
 .date-cell {
   font-weight: bold;
+}
+
+.mobile {
+  .date-column, .to-column, .from-column, .attachment-column, .subject-column ,.plus-column {
+    display: none;
+  }
 }
 
 </style>
