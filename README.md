@@ -1,4 +1,9 @@
-# mission_1
+## To Check The Final Mockup
+```
+npm install
+npm run serve
+access to http://localhost:8080/
+```
 
 ## Project setup
 ```
